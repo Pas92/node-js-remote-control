@@ -1,8 +1,15 @@
 import 'dotenv/config';
 
 import WebSocket, { WebSocketServer } from 'ws';
+import { mouse, left, right, up, down } from '@nut-tree/nut-js';
 
 type Directions = 'up' | 'down' | 'left' | 'right';
+
+interface Command {
+  action: string;
+  firstArg: string;
+  secondArg: string;
+}
 
 enum MESSAGES_FE_MOUSE {
   MOUSE_UP = 'mouse_up',
@@ -22,15 +29,30 @@ enum MESSAGES_FE_PRINT {
   PRINT_SCREEN = 'prnt_scrn',
 }
 
-const moveCursor = (direction: Directions, distance: number): void => {};
+const moveCursor = async (
+  direction: Directions,
+  distance: number
+): Promise<void> => {
+  const mousePosition = await mouse.getPosition();
+  console.log(mousePosition);
 
-const wss = new WebSocketServer({ port: +(process.env.PORT || 8080) });
+  switch (direction) {
+    case 'up':
+      await mouse.move(up(distance));
+      break;
+    case 'down':
+      await mouse.move(down(distance));
+      break;
+    case 'left':
+      await mouse.move(left(distance));
+      break;
+    case 'right':
+      await mouse.move(right(distance));
+      break;
+  }
+};
 
-const handleMessage = function (
-  ws: WebSocket,
-  data: WebSocket.RawData,
-  isBinary?: boolean
-) {
+const parseCommand = (data: WebSocket.RawData): Command => {
   const dataParamsAsString = data.toString();
   const dataParamsAsArray = dataParamsAsString.split(' ');
 
@@ -38,27 +60,43 @@ const handleMessage = function (
   const firstArg = dataParamsAsArray[1];
   const secondArg = dataParamsAsArray[2];
 
-  switch (action) {
+  return {
+    action,
+    firstArg,
+    secondArg,
+  };
+};
+
+const wss = new WebSocketServer({ port: +(process.env.PORT || 8080) });
+
+const handleMessage = async function (
+  ws: WebSocket,
+  data: WebSocket.RawData,
+  isBinary?: boolean
+) {
+  const command = parseCommand(data);
+
+  switch (command.action) {
     case MESSAGES_FE_MOUSE.MOUSE_DOWN:
-      moveCursor('down', +firstArg);
+      await moveCursor('down', +command.firstArg);
       break;
     case MESSAGES_FE_MOUSE.MOUSE_UP:
-      moveCursor('up', +firstArg);
+      await moveCursor('up', +command.firstArg);
       break;
     case MESSAGES_FE_MOUSE.MOUSE_RIGHT:
-      moveCursor('right', +firstArg);
+      await moveCursor('right', +command.firstArg);
       break;
     case MESSAGES_FE_MOUSE.MOUSE_LEFT:
-      moveCursor('left', +firstArg);
+      await moveCursor('left', +command.firstArg);
       break;
   }
   console.log(data);
-  ws.send(action);
+  ws.send(command.action);
 };
 
 const connection = function (ws: WebSocket.WebSocket): void {
-  ws.on('message', (data, isBinary) => {
-    return handleMessage(ws, data, isBinary);
+  ws.on('message', async (data, isBinary) => {
+    await handleMessage(ws, data, isBinary);
   });
 };
 
