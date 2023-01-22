@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import WebSocket, { WebSocketServer } from 'ws';
 import { mouse, left, right, up, down } from '@nut-tree/nut-js';
+import { Point } from '@nut-tree/nut-js/dist/lib/point.class';
 
 type Directions = 'up' | 'down' | 'left' | 'right';
 
@@ -38,16 +39,24 @@ const moveCursor = async (
 
   switch (direction) {
     case 'up':
-      await mouse.move(up(distance));
+      await mouse.setPosition(
+        new Point(mousePosition.x, mousePosition.y - distance)
+      );
       break;
     case 'down':
-      await mouse.move(down(distance));
+      await mouse.setPosition(
+        new Point(mousePosition.x, mousePosition.y + distance)
+      );
       break;
     case 'left':
-      await mouse.move(left(distance));
+      await mouse.setPosition(
+        new Point(mousePosition.x - distance, mousePosition.y)
+      );
       break;
     case 'right':
-      await mouse.move(right(distance));
+      await mouse.setPosition(
+        new Point(mousePosition.x + distance, mousePosition.y)
+      );
       break;
   }
 };
