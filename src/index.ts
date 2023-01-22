@@ -1,8 +1,9 @@
 import 'dotenv/config';
 
 import WebSocket, { WebSocketServer } from 'ws';
-import { mouse, left, right, up, down } from '@nut-tree/nut-js';
+import { mouse, left, right, up, down, straightTo } from '@nut-tree/nut-js';
 import { Point } from '@nut-tree/nut-js/dist/lib/point.class';
+import { Button } from '@nut-tree/nut-js/dist/lib/button.enum';
 
 type Directions = 'up' | 'down' | 'left' | 'right';
 
@@ -61,6 +62,40 @@ const moveCursor = async (
   }
 };
 
+const drawRectangle = async (width: number, height: number): Promise<void> => {
+  const path1 = await right(width);
+  await mouse.drag(path1);
+
+  const path2 = await down(height);
+  await mouse.drag(path2);
+
+  const path3 = await left(width);
+  await mouse.drag(path3);
+
+  const path4 = await up(height);
+  await mouse.drag(path4);
+};
+
+const drawCircle = async (radius: number): Promise<void> => {
+  const startPosition = await mouse.getPosition();
+  const center = {
+    a: startPosition.x,
+    b: startPosition.y - radius,
+  };
+  const path = [];
+
+  for (let i = 0; i <= 360; i++) {
+    const newPoint = {
+      x: center.a + Math.sin((i * Math.PI) / 180) * radius,
+      y: center.b + Math.cos((i * Math.PI) / 180) * radius,
+    };
+
+    path.push(newPoint);
+  }
+
+  await mouse.drag(path);
+};
+
 const parseCommand = (data: WebSocket.RawData): Command => {
   const dataParamsAsString = data.toString();
   const dataParamsAsArray = dataParamsAsString.split(' ');
@@ -97,6 +132,15 @@ const handleMessage = async function (
       break;
     case MESSAGES_FE_MOUSE.MOUSE_LEFT:
       await moveCursor('left', +command.firstArg);
+      break;
+    case MESSAGES_FE_DRAW.DRAW_RECTANGLE:
+      await drawRectangle(+command.firstArg, +command.secondArg);
+      break;
+    case MESSAGES_FE_DRAW.DRAW_SQUARE:
+      await drawRectangle(+command.firstArg, +command.firstArg);
+      break;
+    case MESSAGES_FE_DRAW.DRAW_CIRCLE:
+      await drawCircle(+command.firstArg);
       break;
   }
   console.log(data);
