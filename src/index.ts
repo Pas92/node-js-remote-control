@@ -21,7 +21,7 @@ const handleMessage = async function (
 
   const actionResult = await chooseAction(command);
 
-  if (command.action === MESSAGES_FE_PRINT.PRINT_SCREEN && actionResult) {
+  if (actionResult) {
     ws.send(`${command.action} ${actionResult}`);
   } else {
     ws.send(command.action);

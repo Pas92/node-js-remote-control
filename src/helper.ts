@@ -40,6 +40,8 @@ export const chooseAction = async (
     case MESSAGES_FE_MOUSE.MOUSE_LEFT:
       await moveCursor('left', +command.firstArg);
       break;
+    case MESSAGES_FE_MOUSE.MOUSE_POSITION:
+      return await moveCursor('position', +command.firstArg);
     case MESSAGES_FE_DRAW.DRAW_RECTANGLE:
       await drawRectangle(+command.firstArg, +command.secondArg);
       break;
