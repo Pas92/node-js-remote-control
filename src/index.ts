@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
 import { httpServer } from './http_server';
-import WebSocket, { createWebSocketStream, WebSocketServer } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import { chooseAction, parseCommand } from './helper';
-import { Command, MESSAGES_FE_PRINT } from './types';
+import { Command } from './types';
 
 const HTTP_PORT = 8181;
 
