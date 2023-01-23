@@ -21,8 +21,6 @@ const handleMessage = async function (
 
   const actionResult = await chooseAction(command);
 
-  console.log(data);
-
   if (command.action === MESSAGES_FE_PRINT.PRINT_SCREEN && actionResult) {
     ws.send(`${command.action} ${actionResult}`);
   } else {
@@ -31,8 +29,6 @@ const handleMessage = async function (
 };
 
 const connection = function (ws: WebSocket.WebSocket): void {
-  const duplexStream = createWebSocketStream(ws);
-
   ws.on('message', async (data, isBinary) => {
     await handleMessage(ws, data, isBinary);
   });
