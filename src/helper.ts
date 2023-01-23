@@ -1,7 +1,13 @@
 import WebSocket from 'ws';
 import { drawCircle, drawRectangle } from './drawer';
 import { moveCursor } from './mouse-moves';
-import { Command, MESSAGES_FE_DRAW, MESSAGES_FE_MOUSE } from './types';
+import { sendScreen } from './screen-reader';
+import {
+  Command,
+  MESSAGES_FE_DRAW,
+  MESSAGES_FE_MOUSE,
+  MESSAGES_FE_PRINT,
+} from './types';
 
 export const parseCommand = (data: WebSocket.RawData): Command => {
   const dataParamsAsString = data.toString();
@@ -18,7 +24,9 @@ export const parseCommand = (data: WebSocket.RawData): Command => {
   };
 };
 
-export const chooseAction = async (command: Command): Promise<void> => {
+export const chooseAction = async (
+  command: Command
+): Promise<void | string> => {
   switch (command.action) {
     case MESSAGES_FE_MOUSE.MOUSE_DOWN:
       await moveCursor('down', +command.firstArg);
@@ -41,5 +49,7 @@ export const chooseAction = async (command: Command): Promise<void> => {
     case MESSAGES_FE_DRAW.DRAW_CIRCLE:
       await drawCircle(+command.firstArg);
       break;
+    case MESSAGES_FE_PRINT.PRINT_SCREEN:
+      return await sendScreen();
   }
 };

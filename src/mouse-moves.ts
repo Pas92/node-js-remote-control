@@ -7,7 +7,6 @@ export const moveCursor = async (
   distance: number
 ): Promise<void> => {
   const mousePosition = await mouse.getPosition();
-  console.log(mousePosition);
 
   switch (direction) {
     case 'up':

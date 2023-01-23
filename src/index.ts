@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import WebSocket, { WebSocketServer } from 'ws';
 import { chooseAction, parseCommand } from './helper';
-import { Command } from './types';
+import { Command, MESSAGES_FE_PRINT } from './types';
 
 const wss = new WebSocketServer({ port: +(process.env.PORT || 8080) });
 
@@ -13,10 +13,15 @@ const handleMessage = async function (
 ) {
   const command: Command = parseCommand(data);
 
-  await chooseAction(command);
+  const actionResult = await chooseAction(command);
 
   console.log(data);
-  ws.send(command.action);
+
+  if (command.action === MESSAGES_FE_PRINT.PRINT_SCREEN && actionResult) {
+    ws.send(`${command.action} ${actionResult}`);
+  } else {
+    ws.send(command.action);
+  }
 };
 
 const connection = function (ws: WebSocket.WebSocket): void {
