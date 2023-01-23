@@ -1,5 +1,5 @@
 import { mouse, Region, screen } from '@nut-tree/nut-js';
-import Jimp from 'jimp';
+import Jimp from 'jimp/es';
 
 export const sendScreen = async (): Promise<string> => {
   const mousePosition = await mouse.getPosition();
