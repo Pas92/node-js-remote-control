@@ -19,6 +19,6 @@ export const sendScreen = async (): Promise<string> => {
     height: 200,
   });
 
-  const pngBase64 = await newImage.getBufferAsync(Jimp.MIME_PNG);
-  return pngBase64.toString('base64');
+  const pngBuffer = await newImage.getBufferAsync(Jimp.MIME_PNG);
+  return pngBuffer.toString('base64');
 };
